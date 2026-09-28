@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>eSports World Central</title>
+
+    <meta name="description" content="eSports World Central - Explore esports games, teams, players, tournaments, statistics, records and history.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #151923;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .menu {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #111827, #263b63);
+            color: white;
+            padding: 55px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 38px;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #d7dce7;
+            max-width: 600px;
+            margin: auto;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-size: 25px;
+            margin-bottom: 18px;
+        }
+
+        .games {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .game-card {
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .game-card h3 {
+            font-size: 21px;
+            margin-bottom: 10px;
+        }
+
+        .game-card p {
+            color: #667085;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .button {
+            display: inline-block;
+            background: #111827;
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .coming {
+            background: #eef0f4;
+            color: #667085;
+        }
+
+        .explore {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .explore-card {
+            background: white;
+            padding: 22px 12px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .intro {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            line-height: 1.7;
+            color: #4b5563;
+        }
+
+        footer {
+            background: #111827;
+            color: #9ca3af;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 30px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero {
+                padding: 45px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">eSports World Central</div>
+    <div class="menu">☰</div>
+</header>
+
+<section class="hero">
+    <h1>eSports World Central</h1>
+    <p>
+        Explore the world of competitive gaming —
+        games, teams, players, tournaments, statistics,
+        records and esports history.
+    </p>
+</section>
+
+<main class="container">
+
+    <section>
+        <h2 class="section-title">Explore Games</h2>
+
+        <div class="games">
+
+            <div class="game-card">
+                <h3>🎮 BGMI</h3>
+                <p>
+                    Explore BGMI teams, players, tournaments,
+                    achievements, statistics and competitive history.
+                </p>
+
+                <a href="#" class="button">Explore BGMI</a>
+            </div>
+
+            <div class="game-card">
+                <h3>🎯 PUBG Mobile</h3>
+                <p>
+                    PUBG Mobile esports database and history.
+                    This section will be developed after BGMI.
+                </p>
+
+                <span class="button coming">Coming Soon</span>
+            </div>
+
+        </div>
+    </section>
+
+    <section style="margin-top: 40px;">
+        <h2 class="section-title">Explore</h2>
+
+        <div class="explore">
+
+            <div class="explore-card">👥<br>Teams</div>
+            <div class="explore-card">👤<br>Players</div>
+            <div class="explore-card">🏆<br>Tournaments</div>
+            <div class="explore-card">📊<br>Statistics</div>
+            <div class="explore-card">🏅<br>Records</div>
+            <div class="explore-card">📜<br>History</div>
+
+        </div>
+    </section>
+
+    <section style="margin-top: 40px;">
+        <h2 class="section-title">About the Archive</h2>
+
+        <div class="intro">
+            <p>
+                eSports World Central is an independent project
+                dedicated to documenting competitive gaming.
+                Our goal is to organize information about games,
+                teams, players, tournaments, results, achievements,
+                statistics and esports history in one place.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <strong>eSports World Central</strong>
+    <br>
+    Independent esports information and archive project.
+    <br><br>
+    Not affiliated with BGMI, PUBG Mobile, KRAFTON,
+    or any esports organization.
+</footer>
+
+</body>
+</html>
