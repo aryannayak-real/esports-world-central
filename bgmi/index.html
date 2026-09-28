@@ -73,10 +73,19 @@ header p {
 }
 
 .card {
+    display: block;
     background: white;
     border: 1px solid #e3e7ee;
     border-radius: 14px;
     padding: 22px;
+    text-decoration: none;
+    color: #172033;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .card h3 {
@@ -124,49 +133,61 @@ footer {
         <h2>BGMI Esports</h2>
         <p>
             Explore the competitive world of Battlegrounds Mobile India.
-            Discover teams, players, tournaments, statistics, records,
-            achievements and esports history.
+            Discover teams, players, tournaments, statistics, transfers
+            and esports history.
         </p>
     </section>
 
     <div class="grid">
 
-        <div class="card">
+        <a class="card" href="../teams/index.html">
             <h3>🏆 Teams</h3>
-            <p>Explore BGMI esports teams, organizations, rosters and history.</p>
-        </div>
+            <p>
+                Explore BGMI esports teams, organizations and competitive rosters.
+            </p>
+        </a>
 
-        <div class="card">
+        <a class="card" href="#">
             <h3>👤 Players</h3>
-            <p>Explore professional players, careers, teams and achievements.</p>
-        </div>
+            <p>
+                Explore professional players, careers, teams and achievements.
+            </p>
+        </a>
 
-        <div class="card">
+        <a class="card" href="#">
             <h3>🏅 Tournaments</h3>
-            <p>Explore tournaments, results, standings, winners and history.</p>
-        </div>
+            <p>
+                Explore tournaments, results, standings and major competitions.
+            </p>
+        </a>
 
-        <div class="card">
+        <a class="card" href="#">
             <h3>📊 Statistics</h3>
-            <p>Explore player, team and tournament statistics.</p>
-        </div>
+            <p>
+                Explore player, team and tournament statistics.
+            </p>
+        </a>
 
-        <div class="card">
+        <a class="card" href="#">
             <h3>🔄 Transfers</h3>
-            <p>Track roster changes and player transfers.</p>
-        </div>
+            <p>
+                Track roster changes and player transfers.
+            </p>
+        </a>
 
-        <div class="card">
+        <a class="card" href="#">
             <h3>📜 History</h3>
-            <p>Explore the history and major milestones of BGMI esports.</p>
-        </div>
+            <p>
+                Explore the history and major milestones of BGMI esports.
+            </p>
+        </a>
 
     </div>
 
 </div>
 
 <footer>
-    <p>eSports World Central is an independent esports information project.</p>
+    <p>eSports World Central is an independent esports information website.</p>
     <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
 </footer>
 
