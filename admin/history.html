@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>History | eSports World Central</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #aeb8c7;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0 12px;
+    border: 1px solid #d5dbe5;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.delete-btn {
+    background: #dc2626;
+    margin-top: 10px;
+}
+
+.message {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.history-card {
+    border: 1px solid #e3e7ee;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.history-card h3 {
+    margin: 0 0 10px;
+}
+
+.history-card p {
+    margin: 6px 0;
+    color: #5f6978;
+    line-height: 1.5;
+}
+
+.empty {
+    text-align: center;
+    color: #697386;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <p>Admin Control Panel</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+    <div class="card">
+
+        <h2>Add History</h2>
+
+        <form id="historyForm">
+
+            <label>Title</label>
+            <input
+                type="text"
+                id="title"
+                placeholder="Example: BGMI India Series 2026"
+                required
+            >
+
+            <label>Date</label>
+            <input type="date" id="eventDate">
+
+            <label>Category</label>
+            <select id="category">
+                <option value="">Select Category</option>
+                <option value="Tournament">Tournament</option>
+                <option value="Team">Team</option>
+                <option value="Player">Player</option>
+                <option value="Organization">Organization</option>
+                <option value="Esports">Esports</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label>Description</label>
+            <textarea
+                id="description"
+                placeholder="Write the historical event or information..."
+            ></textarea>
+
+            <label>Image URL</label>
+            <input
+                type="url"
+                id="imageUrl"
+                placeholder="https://example.com/image.jpg"
+            >
+
+            <button type="submit">Add History</button>
+
+        </form>
+
+        <div id="message" class="message"></div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>History Entries</h2>
+
+        <div id="historyList">
+            <div class="empty">Loading history...</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const { createClient } = supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+const form = document.getElementById("historyForm");
+const historyList = document.getElementById("historyList");
+const message = document.getElementById("message");
+
+async function checkAdmin() {
+
+    const {
+        data: { user }
+    } = await db.auth.getUser();
+
+    if (!user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    const { data, error } = await db.rpc("is_admin");
+
+    if (error || !data) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    return true;
+}
+
+async function loadHistory() {
+
+    const { data, error } = await db
+        .from("history")
+        .select("*")
+        .order("event_date", { ascending: false });
+
+    if (error) {
+
+        historyList.innerHTML = `
+            <div class="error">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        historyList.innerHTML = `
+            <div class="empty">
+                No history entries added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    historyList.innerHTML = data.map(item => {
+
+        return `
+            <div class="history-card">
+
+                <h3>
+                    ${escapeHtml(item.title)}
+                </h3>
+
+                ${
+                    item.event_date
+                    ? `
+                        <p>
+                            <strong>Date:</strong>
+                            ${formatDate(item.event_date)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    item.category
+                    ? `
+                        <p>
+                            <strong>Category:</strong>
+                            ${escapeHtml(item.category)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    item.description
+                    ? `
+                        <p>
+                            ${escapeHtml(item.description)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    item.image_url
+                    ? `
+                        <p>
+                            <strong>Image:</strong>
+                            ${escapeHtml(item.image_url)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteHistory(${item.id})"
+                >
+                    Delete
+                </button>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const { error } = await db
+        .from("history")
+        .insert({
+            title:
+                document
+                    .getElementById("title")
+                    .value
+                    .trim(),
+
+            event_date:
+                document
+                    .getElementById("eventDate")
+                    .value || null,
+
+            category:
+                document
+                    .getElementById("category")
+                    .value || null,
+
+            description:
+                document
+                    .getElementById("description")
+                    .value
+                    .trim() || null,
+
+            image_url:
+                document
+                    .getElementById("imageUrl")
+                    .value
+                    .trim() || null
+        });
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("History entry added successfully.");
+
+    form.reset();
+
+    await loadHistory();
+
+});
+
+async function deleteHistory(id) {
+
+    if (!confirm("Delete this history entry?")) {
+        return;
+    }
+
+    const { error } = await db
+        .from("history")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("History entry deleted.");
+
+    await loadHistory();
+}
+
+function showMessage(text, isError = false) {
+
+    message.textContent = text;
+
+    message.className =
+        "message " +
+        (isError ? "error" : "success");
+
+    message.style.display = "block";
+
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 4000);
+}
+
+function formatDate(date) {
+
+    if (!date) {
+        return "";
+    }
+
+    const d = new Date(date + "T00:00:00");
+
+    return d.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+async function start() {
+
+    const isAdmin = await checkAdmin();
+
+    if (!isAdmin) {
+        return;
+    }
+
+    await loadHistory();
+}
+
+start();
+
+</script>
+
+</body>
+</html>

@@ -1,167 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BGMI Esports History | eSports World Central</title>
+    <title>BGMI History | eSports World Central</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #172033;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0f;
+            color: #fff;
+        }
 
-header {
-    background: #111827;
-    color: white;
-    padding: 20px;
-}
+        header {
+            padding: 25px 20px;
+            text-align: center;
+            background: #111118;
+            border-bottom: 1px solid #24242d;
+        }
 
-header h1 {
-    margin: 0;
-    font-size: 22px;
-}
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
 
-header p {
-    margin: 5px 0 0;
-    color: #aeb8c7;
-    font-size: 13px;
-}
+        header p {
+            margin: 8px 0 0;
+            color: #999;
+        }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 25px 18px;
-}
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
 
-.back {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: #2563eb;
-    text-decoration: none;
-}
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
 
-.hero {
-    background: #182338;
-    color: white;
-    border-radius: 16px;
-    padding: 30px 22px;
-    margin-bottom: 25px;
-}
+        .top-bar h2 {
+            margin: 0;
+        }
 
-.hero h2 {
-    margin: 0 0 10px;
-    font-size: 32px;
-}
+        .search {
+            width: 280px;
+            max-width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #16161d;
+            color: white;
+            outline: none;
+        }
 
-.hero p {
-    color: #cbd5e1;
-    line-height: 1.6;
-}
+        .search:focus {
+            border-color: #777;
+        }
 
-.timeline {
-    position: relative;
-    margin-top: 20px;
-}
+        #history {
+            display: grid;
+            gap: 18px;
+        }
 
-.event {
-    background: white;
-    border: 1px solid #e3e7ee;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 15px;
-}
+        .history-card {
+            background: #15151c;
+            border: 1px solid #292933;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
-.event .year {
-    color: #2563eb;
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
+        .history-image {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            display: block;
+        }
 
-.event h3 {
-    margin: 0 0 8px;
-}
+        .content {
+            padding: 20px;
+        }
 
-.event p {
-    margin: 0;
-    color: #697386;
-    line-height: 1.6;
-}
+        .title {
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
 
-footer {
-    text-align: center;
-    padding: 30px 15px;
-    color: #7b8494;
-    font-size: 13px;
-}
-</style>
+        .meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .category {
+            background: #22222b;
+            padding: 5px 9px;
+            border-radius: 5px;
+        }
+
+        .description {
+            color: #bbb;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .loading,
+        .empty,
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .error {
+            color: #ff7777;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .title {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-    <h1>eSports World Central</h1>
-    <p>The Central Hub for Competitive Gaming</p>
+    <h1>BGMI History</h1>
+    <p>Important events and moments in BGMI esports</p>
 </header>
 
 <div class="container">
 
-    <a class="back" href="../bgmi/index.html">← Back to BGMI</a>
+    <div class="top-bar">
+        <h2>History</h2>
 
-    <section class="hero">
-        <h2>BGMI Esports History</h2>
-        <p>
-            Explore the development of competitive BGMI,
-            major milestones, tournaments, teams and
-            players throughout its esports history.
-        </p>
-    </section>
+        <input
+            type="text"
+            id="search"
+            class="search"
+            placeholder="Search history..."
+        >
+    </div>
 
-    <div class="timeline">
-
-        <div class="event">
-            <div class="year">Timeline</div>
-            <h3>Major Milestones</h3>
-            <p>
-                Important events, tournaments, organizations
-                and competitive milestones will be documented here.
-            </p>
-        </div>
-
-        <div class="event">
-            <div class="year">Coming Soon</div>
-            <h3>Historical Tournament Records</h3>
-            <p>
-                Past tournament results, champions, notable
-                performances and historical records will be added.
-            </p>
-        </div>
-
-        <div class="event">
-            <div class="year">Coming Soon</div>
-            <h3>Team & Player History</h3>
-            <p>
-                Historical team rosters, player careers and
-                major competitive achievements will be documented.
-            </p>
-        </div>
-
+    <div id="history">
+        <div class="loading">Loading history...</div>
     </div>
 
 </div>
 
-<footer>
-    <p>eSports World Central is an independent esports information website.</p>
-    <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
-</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+    const supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+    let allHistory = [];
+
+    async function loadHistory() {
+
+        const container = document.getElementById("history");
+
+        const { data, error } = await supabaseClient
+            .from("history")
+            .select("*")
+            .order("event_date", { ascending: false });
+
+        if (error) {
+            console.error(error);
+
+            container.innerHTML = `
+                <div class="error">
+                    Unable to load history.
+                </div>
+            `;
+
+            return;
+        }
+
+        allHistory = data || [];
+
+        displayHistory(allHistory);
+    }
+
+    function displayHistory(history) {
+
+        const container = document.getElementById("history");
+
+        if (!history.length) {
+            container.innerHTML = `
+                <div class="empty">
+                    No history entries available yet.
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = history.map(item => {
+
+            const date = item.event_date
+                ? new Date(
+                    item.event_date + "T00:00:00"
+                ).toLocaleDateString()
+                : "Date not available";
+
+            return `
+                <article class="history-card">
+
+                    ${
+                        item.image_url
+                        ? `
+                            <img
+                                class="history-image"
+                                src="${escapeHtml(item.image_url)}"
+                                alt="${escapeHtml(item.title)}"
+                                loading="lazy"
+                                onerror="this.style.display='none'"
+                            >
+                        `
+                        : ""
+                    }
+
+                    <div class="content">
+
+                        <div class="title">
+                            ${escapeHtml(item.title)}
+                        </div>
+
+                        <div class="meta">
+
+                            <span>
+                                📅 ${escapeHtml(date)}
+                            </span>
+
+                            ${
+                                item.category
+                                ? `
+                                    <span class="category">
+                                        ${escapeHtml(item.category)}
+                                    </span>
+                                `
+                                : ""
+                            }
+
+                        </div>
+
+                        ${
+                            item.description
+                            ? `
+                                <div class="description">
+                                    ${escapeHtml(item.description)}
+                                </div>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+                </article>
+            `;
+
+        }).join("");
+    }
+
+    document.getElementById("search").addEventListener(
+        "input",
+        function () {
+
+            const searchText = this.value
+                .toLowerCase()
+                .trim();
+
+            const filtered = allHistory.filter(item => {
+
+                const text = `
+                    ${item.title || ""}
+                    ${item.category || ""}
+                    ${item.description || ""}
+                `.toLowerCase();
+
+                return text.includes(searchText);
+            });
+
+            displayHistory(filtered);
+        }
+    );
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    loadHistory();
+</script>
 
 </body>
 </html>

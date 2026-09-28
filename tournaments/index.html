@@ -6,6 +6,8 @@
 
 <title>BGMI Tournaments | eSports World Central</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 * {
     box-sizing: border-box;
@@ -66,6 +68,58 @@ header p {
     line-height: 1.6;
 }
 
+.search-box {
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d9dee7;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+}
+
+.tournament-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+}
+
+.tournament-card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.tournament-card h3 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.tournament-card p {
+    margin: 7px 0;
+    color: #5f6978;
+    line-height: 1.5;
+}
+
+.tournament-card strong {
+    color: #172033;
+}
+
+.description {
+    margin-top: 14px !important;
+    padding-top: 12px;
+    border-top: 1px solid #edf0f4;
+}
+
 .empty {
     background: white;
     border: 1px solid #e3e7ee;
@@ -80,6 +134,15 @@ header p {
 
 .empty p {
     color: #697386;
+}
+
+.error {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #be123c;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
 }
 
 footer {
@@ -110,12 +173,19 @@ footer {
         </p>
     </section>
 
-    <div class="empty">
-        <h3>Tournaments Coming Soon</h3>
-        <p>
-            Tournament information, results and standings
-            will be added here.
-        </p>
+    <div class="search-box">
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search tournaments..."
+        >
+    </div>
+
+    <div id="tournamentContainer">
+        <div class="empty">
+            <h3>Loading tournaments...</h3>
+            <p>Please wait.</p>
+        </div>
     </div>
 
 </div>
@@ -124,6 +194,174 @@ footer {
     <p>eSports World Central is an independent esports information website.</p>
     <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
 </footer>
+
+<script>
+
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const { createClient } = supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let tournaments = [];
+
+const container = document.getElementById("tournamentContainer");
+const searchInput = document.getElementById("searchInput");
+
+async function loadTournaments() {
+
+    const { data, error } = await db
+        .from("tournaments")
+        .select("*")
+        .order("start_date", { ascending: false });
+
+    if (error) {
+        console.error(error);
+
+        container.innerHTML = `
+            <div class="error">
+                <strong>Unable to load tournaments.</strong>
+                <p>${escapeHtml(error.message)}</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    tournaments = data || [];
+
+    renderTournaments(tournaments);
+}
+
+function renderTournaments(list) {
+
+    if (!list.length) {
+
+        container.innerHTML = `
+            <div class="empty">
+                <h3>No tournaments found</h3>
+                <p>
+                    Tournament information will appear here
+                    when tournaments are added from the admin panel.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="tournament-grid">
+            ${list.map(tournament => {
+
+                const startDate = formatDate(tournament.start_date);
+                const endDate = formatDate(tournament.end_date);
+
+                return `
+                    <div class="tournament-card">
+
+                        <h3>
+                            ${escapeHtml(tournament.name || "Unnamed Tournament")}
+                        </h3>
+
+                        ${tournament.organizer ? `
+                            <p>
+                                <strong>Organizer:</strong>
+                                ${escapeHtml(tournament.organizer)}
+                            </p>
+                        ` : ""}
+
+                        ${tournament.start_date ? `
+                            <p>
+                                <strong>Start:</strong>
+                                ${startDate}
+                            </p>
+                        ` : ""}
+
+                        ${tournament.end_date ? `
+                            <p>
+                                <strong>End:</strong>
+                                ${endDate}
+                            </p>
+                        ` : ""}
+
+                        ${tournament.prize_pool ? `
+                            <p>
+                                <strong>Prize Pool:</strong>
+                                ${escapeHtml(tournament.prize_pool)}
+                            </p>
+                        ` : ""}
+
+                        ${tournament.location ? `
+                            <p>
+                                <strong>Location:</strong>
+                                ${escapeHtml(tournament.location)}
+                            </p>
+                        ` : ""}
+
+                        ${tournament.description ? `
+                            <p class="description">
+                                ${escapeHtml(tournament.description)}
+                            </p>
+                        ` : ""}
+
+                    </div>
+                `;
+
+            }).join("")}
+        </div>
+    `;
+}
+
+searchInput.addEventListener("input", function() {
+
+    const query = this.value.toLowerCase().trim();
+
+    const filtered = tournaments.filter(tournament => {
+
+        return (
+            (tournament.name || "").toLowerCase().includes(query) ||
+            (tournament.organizer || "").toLowerCase().includes(query) ||
+            (tournament.location || "").toLowerCase().includes(query)
+        );
+
+    });
+
+    renderTournaments(filtered);
+});
+
+function formatDate(date) {
+
+    if (!date) {
+        return "";
+    }
+
+    const d = new Date(date + "T00:00:00");
+
+    return d.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+loadTournaments();
+
+</script>
 
 </body>
 </html>

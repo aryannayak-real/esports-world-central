@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - eSports World Central</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0f19;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #151b29;
+            border-bottom: 1px solid #293246;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 20px;
+        }
+
+        #logoutButton {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 25px 20px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #9ba6ba;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: #151b29;
+            border: 1px solid #293246;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: #9ba6ba;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .card button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 25px;
+            background: #151b29;
+            border: 1px solid #293246;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .status h3 {
+            margin-bottom: 10px;
+        }
+
+        #statusText {
+            color: #9ba6ba;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <button id="logoutButton">Logout</button>
+</header>
+
+<main>
+
+    <div class="welcome">
+        <h2>Admin Dashboard</h2>
+        <p>Manage your esports website from one place.</p>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Teams</h3>
+            <p>Add and manage esports teams, logos, countries and descriptions.</p>
+            <button onclick="window.location.href='teams.html'">
+                Manage Teams
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Players</h3>
+            <p>Add players, IGN, teams, roles, photos and biographies.</p>
+            <button onclick="window.location.href='players.html'">
+                Manage Players
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Tournaments</h3>
+            <p>Create and manage tournaments, dates, prize pools and organizers.</p>
+            <button onclick="window.location.href='tournaments.html'">
+                Manage Tournaments
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Matches</h3>
+            <p>Add matches between teams and connect them with tournaments.</p>
+            <button onclick="window.location.href='matches.html'">
+                Manage Matches
+            </button>
+        </div>
+                <div class="card">
+            <h3>Statistics</h3>
+            <p>Manage player performance and statistics.</p>
+            <button onclick="window.location.href='statistics.html'">
+                Manage Statistics
+            </button>
+        </div>                                                                              
+         <div class="card">
+    <h3>Transfers</h3>
+    <p>Manage player transfers between teams.</p>
+    <button onclick="window.location.href='transfers.html'">
+        Manage Transfers
+    </button>
+</div>
+      <div class="card">
+    <h3>History</h3>
+    <p>Manage important esports history and events.</p>
+    <button onclick="window.location.href='history.html'">
+        Manage History
+    </button>
+</div>
+    </div>
+
+    <div class="status">
+        <h3>System Status</h3>
+        <div id="statusText">Checking authentication...</div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function checkAdmin() {
+
+    const statusText = document.getElementById("statusText");
+
+    try {
+        const {
+            data: { user },
+            error: userError
+        } = await supabaseClient.auth.getUser();
+
+        if (userError) {
+            statusText.textContent = "Authentication error: " + userError.message;
+            return;
+        }
+
+        if (!user) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        const { data, error } = await supabaseClient.rpc("is_admin");
+
+        if (error) {
+            statusText.textContent =
+                "Admin verification error: " + error.message;
+            return;
+        }
+
+        if (data !== true) {
+            await supabaseClient.auth.signOut();
+            statusText.textContent = "Access denied.";
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1500);
+            return;
+        }
+
+        statusText.textContent =
+            "Authenticated as admin: " + user.email;
+
+    } catch (error) {
+        statusText.textContent =
+            "Unexpected error: " + error.message;
+    }
+}
+
+document.getElementById("logoutButton").addEventListener(
+    "click",
+    async function() {
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+    }
+);
+
+checkAdmin();
+</script>
+
+</body>
+</html>

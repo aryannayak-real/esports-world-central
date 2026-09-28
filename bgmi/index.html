@@ -1,194 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BGMI Esports | eSports World Central</title>
+    <title>BGMI Esports | eSports World Central</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #172033;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0f;
+            color: #fff;
+        }
 
-header {
-    background: #111827;
-    color: white;
-    padding: 20px;
-}
+        header {
+            text-align: center;
+            padding: 45px 20px;
+            background: #111118;
+            border-bottom: 1px solid #292933;
+        }
 
-header h1 {
-    margin: 0;
-    font-size: 22px;
-}
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
 
-header p {
-    margin: 5px 0 0;
-    color: #aeb8c7;
-    font-size: 13px;
-}
+        header p {
+            color: #999;
+            margin-top: 10px;
+        }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 25px 18px;
-}
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 35px 20px;
+        }
 
-.back {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: #2563eb;
-    text-decoration: none;
-}
+        .section-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-.hero {
-    background: #182338;
-    color: white;
-    border-radius: 16px;
-    padding: 30px 22px;
-    margin-bottom: 25px;
-}
+        .section-title h2 {
+            margin: 0;
+            font-size: 26px;
+        }
 
-.hero h2 {
-    margin: 0 0 10px;
-    font-size: 32px;
-}
+        .section-title p {
+            color: #888;
+        }
 
-.hero p {
-    color: #cbd5e1;
-    line-height: 1.6;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+            );
+            gap: 18px;
+        }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
+        .card {
+            background: #15151c;
+            border: 1px solid #292933;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: 0.2s;
+        }
 
-.card {
-    display: block;
-    background: white;
-    border: 1px solid #e3e7ee;
-    border-radius: 14px;
-    padding: 22px;
-    text-decoration: none;
-    color: #172033;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #555;
+        }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
+        .card-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
 
-.card h3 {
-    margin: 0 0 8px;
-}
+        .card h3 {
+            margin: 8px 0;
+            font-size: 20px;
+        }
 
-.card p {
-    margin: 0;
-    color: #697386;
-    font-size: 14px;
-    line-height: 1.5;
-}
+        .card p {
+            color: #999;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 42px;
+        }
 
-footer {
-    text-align: center;
-    padding: 30px 15px;
-    color: #7b8494;
-    font-size: 13px;
-}
+        .card a {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 18px;
+            border-radius: 7px;
+            background: #22222b;
+            color: white;
+            text-decoration: none;
+            border: 1px solid #333;
+        }
 
-@media (max-width: 600px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+        .card a:hover {
+            background: #2d2d38;
+        }
 
-    .hero h2 {
-        font-size: 27px;
-    }
-}
-</style>
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 30px;
+            color: #777;
+            border-top: 1px solid #24242d;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            .container {
+                padding: 25px 15px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-    <h1>eSports World Central</h1>
-    <p>The Central Hub for Competitive Gaming</p>
+    <h1>BGMI Esports</h1>
+    <p>Explore the competitive BGMI esports world</p>
 </header>
 
 <div class="container">
 
-    <a class="back" href="../index.html">← Back to Home</a>
-
-    <section class="hero">
-        <h2>BGMI Esports</h2>
-        <p>
-            Explore the competitive world of Battlegrounds Mobile India.
-            Discover teams, players, tournaments, statistics, transfers
-            and esports history.
-        </p>
-    </section>
+    <div class="section-title">
+        <h2>Explore BGMI</h2>
+        <p>Teams, players, tournaments, matches and esports history</p>
+    </div>
 
     <div class="grid">
 
-        <a class="card" href="../teams/index.html">
-            <h3>🏆 Teams</h3>
+        <div class="card">
+            <div class="card-icon">🏆</div>
+            <h3>Teams</h3>
             <p>
-                Explore BGMI esports teams, organizations and competitive rosters.
+                Explore BGMI esports teams and organizations.
             </p>
-        </a>
+            <a href="../teams/">
+                View Teams
+            </a>
+        </div>
 
-        <a class="card" href="../players/index.html">
-            <h3>👤 Players</h3>
+        <div class="card">
+            <div class="card-icon">👤</div>
+            <h3>Players</h3>
             <p>
-                Explore professional players, careers, teams and achievements.
+                Discover competitive BGMI players and their profiles.
             </p>
-        </a>
+            <a href="../players/">
+                View Players
+            </a>
+        </div>
 
-        <a class="card" href="../tournaments/index.html">
-            <h3>🏅 Tournaments</h3>
+        <div class="card">
+            <div class="card-icon">🏅</div>
+            <h3>Tournaments</h3>
             <p>
-                Explore tournaments, results, standings and major competitions.
+                Browse BGMI tournaments, dates and prize pools.
             </p>
-        </a>
+            <a href="../tournaments/">
+                View Tournaments
+            </a>
+        </div>
 
-        <a class="card" href="../statistics/index.html">
-            <h3>📊 Statistics</h3>
+        <div class="card">
+            <div class="card-icon">⚔️</div>
+            <h3>Matches</h3>
             <p>
-                Explore player, team and tournament statistics.
+                See matches, teams, dates and match results.
             </p>
-        </a>
+            <a href="../matches/">
+                View Matches
+            </a>
+        </div>
 
-        <a class="card" href="../transfers/index.html">
-            <h3>🔄 Transfers</h3>
+        <div class="card">
+            <div class="card-icon">📊</div>
+            <h3>Statistics</h3>
             <p>
-                Track roster changes and player transfers.
+                Explore player performance and competitive statistics.
             </p>
-        </a>
+            <a href="../statistics/">
+                View Statistics
+            </a>
+        </div>
 
-        <a class="card" href="../history/index.html">
-            <h3>📜 History</h3>
+        <div class="card">
+            <div class="card-icon">🔄</div>
+            <h3>Transfers</h3>
             <p>
-                Explore the history and major milestones of BGMI esports.
+                Track player movements between esports teams.
             </p>
-        </a>
+            <a href="../transfers/">
+                View Transfers
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">📜</div>
+            <h3>History</h3>
+            <p>
+                Explore important moments and events in BGMI esports.
+            </p>
+            <a href="../history/">
+                View History
+            </a>
+        </div>
 
     </div>
 
 </div>
 
 <footer>
-    <p>eSports World Central is an independent esports information website.</p>
-    <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
+    © 2026 eSports World Central
 </footer>
 
 </body>

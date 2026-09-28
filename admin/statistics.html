@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Statistics | eSports World Central</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #aeb8c7;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0 12px;
+    border: 1px solid #d5dbe5;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.message {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.stat-card {
+    border: 1px solid #e3e7ee;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.stat-card h3 {
+    margin: 0 0 8px;
+}
+
+.stat-card p {
+    margin: 5px 0;
+    color: #5f6978;
+}
+
+.delete-btn {
+    background: #dc2626;
+    margin-top: 10px;
+}
+
+.empty {
+    text-align: center;
+    color: #697386;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <p>Admin Control Panel</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+    <div class="card">
+
+        <h2>Add Player Statistics</h2>
+
+        <form id="statForm">
+
+            <label>Player</label>
+            <select id="player" required>
+                <option value="">Select Player</option>
+            </select>
+
+            <label>Tournaments Played</label>
+            <input type="number" id="tournaments_played" min="0" value="0">
+
+            <label>Matches Played</label>
+            <input type="number" id="matches_played" min="0" value="0">
+
+            <label>Matches Won</label>
+            <input type="number" id="matches_won" min="0" value="0">
+
+            <label>Total Kills</label>
+            <input type="number" id="kills" min="0" value="0">
+
+            <label>Assists</label>
+            <input type="number" id="assists" min="0" value="0">
+
+            <label>Average Damage</label>
+            <input type="number" id="average_damage" min="0" step="0.01" value="0">
+
+            <label>Average Survival Time</label>
+            <input
+                type="text"
+                id="average_survival"
+                placeholder="Example: 18:42"
+            >
+
+            <label>Notes</label>
+            <textarea
+                id="notes"
+                placeholder="Additional statistics or achievements"
+            ></textarea>
+
+            <button type="submit">Add Statistics</button>
+
+        </form>
+
+        <div id="message" class="message"></div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Player Statistics</h2>
+
+        <div id="statisticsList">
+            <div class="empty">Loading statistics...</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const { createClient } = supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+const statForm = document.getElementById("statForm");
+const playerSelect = document.getElementById("player");
+const statisticsList = document.getElementById("statisticsList");
+const message = document.getElementById("message");
+
+async function checkAdmin() {
+
+    const {
+        data: { user }
+    } = await db.auth.getUser();
+
+    if (!user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    const { data, error } = await db.rpc("is_admin");
+
+    if (error || !data) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    return true;
+}
+
+async function loadPlayers() {
+
+    const { data, error } = await db
+        .from("players")
+        .select("id, name, ign")
+        .order("name");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    playerSelect.innerHTML =
+        '<option value="">Select Player</option>';
+
+    (data || []).forEach(player => {
+
+        const option = document.createElement("option");
+
+        option.value = player.id;
+
+        option.textContent =
+            player.ign
+                ? `${player.name} (${player.ign})`
+                : player.name;
+
+        playerSelect.appendChild(option);
+
+    });
+}
+
+async function loadStatistics() {
+
+    const { data, error } = await db
+        .from("player_statistics")
+        .select(`
+            id,
+            tournaments_played,
+            matches_played,
+            matches_won,
+            kills,
+            assists,
+            average_damage,
+            average_survival,
+            notes,
+            players (
+                name,
+                ign
+            )
+        `)
+        .order("kills", { ascending: false });
+
+    if (error) {
+
+        statisticsList.innerHTML = `
+            <div class="error">
+                Statistics could not be loaded.<br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        statisticsList.innerHTML = `
+            <div class="empty">
+                No player statistics added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    statisticsList.innerHTML = data.map(stat => {
+
+        const playerName =
+            stat.players?.name || "Unknown Player";
+
+        const ign =
+            stat.players?.ign
+                ? ` (${stat.players.ign})`
+                : "";
+
+        return `
+            <div class="stat-card">
+
+                <h3>
+                    ${escapeHtml(playerName)}
+                    ${escapeHtml(ign)}
+                </h3>
+
+                <p>
+                    <strong>Tournaments:</strong>
+                    ${stat.tournaments_played ?? 0}
+                </p>
+
+                <p>
+                    <strong>Matches:</strong>
+                    ${stat.matches_played ?? 0}
+                </p>
+
+                <p>
+                    <strong>Wins:</strong>
+                    ${stat.matches_won ?? 0}
+                </p>
+
+                <p>
+                    <strong>Kills:</strong>
+                    ${stat.kills ?? 0}
+                </p>
+
+                <p>
+                    <strong>Assists:</strong>
+                    ${stat.assists ?? 0}
+                </p>
+
+                <p>
+                    <strong>Average Damage:</strong>
+                    ${stat.average_damage ?? 0}
+                </p>
+
+                <p>
+                    <strong>Average Survival:</strong>
+                    ${escapeHtml(stat.average_survival || "-")}
+                </p>
+
+                ${
+                    stat.notes
+                    ? `
+                        <p>
+                            <strong>Notes:</strong>
+                            ${escapeHtml(stat.notes)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteStatistics(${stat.id})"
+                >
+                    Delete
+                </button>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+statForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const playerId = playerSelect.value;
+
+    if (!playerId) {
+        showMessage("Please select a player.", true);
+        return;
+    }
+
+    const {
+        error
+    } = await db
+        .from("player_statistics")
+        .insert({
+            player_id: Number(playerId),
+            tournaments_played:
+                Number(document.getElementById("tournaments_played").value) || 0,
+            matches_played:
+                Number(document.getElementById("matches_played").value) || 0,
+            matches_won:
+                Number(document.getElementById("matches_won").value) || 0,
+            kills:
+                Number(document.getElementById("kills").value) || 0,
+            assists:
+                Number(document.getElementById("assists").value) || 0,
+            average_damage:
+                Number(document.getElementById("average_damage").value) || 0,
+            average_survival:
+                document.getElementById("average_survival").value.trim(),
+            notes:
+                document.getElementById("notes").value.trim()
+        });
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("Statistics added successfully.");
+
+    statForm.reset();
+
+    document.getElementById("tournaments_played").value = 0;
+    document.getElementById("matches_played").value = 0;
+    document.getElementById("matches_won").value = 0;
+    document.getElementById("kills").value = 0;
+    document.getElementById("assists").value = 0;
+    document.getElementById("average_damage").value = 0;
+
+    await loadStatistics();
+
+});
+
+async function deleteStatistics(id) {
+
+    if (!confirm("Delete these statistics?")) {
+        return;
+    }
+
+    const { error } = await db
+        .from("player_statistics")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("Statistics deleted.");
+
+    loadStatistics();
+}
+
+function showMessage(text, isError = false) {
+
+    message.textContent = text;
+
+    message.className =
+        "message " +
+        (isError ? "error" : "success");
+
+    message.style.display = "block";
+
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 4000);
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+async function start() {
+
+    const isAdmin = await checkAdmin();
+
+    if (!isAdmin) {
+        return;
+    }
+
+    await loadPlayers();
+    await loadStatistics();
+}
+
+start();
+
+</script>
+
+</body>
+</html>

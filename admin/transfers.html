@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Transfers | eSports World Central</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #aeb8c7;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0 12px;
+    border: 1px solid #d5dbe5;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.delete-btn {
+    background: #dc2626;
+    margin-top: 10px;
+}
+
+.message {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.transfer-card {
+    border: 1px solid #e3e7ee;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.transfer-card h3 {
+    margin: 0 0 10px;
+}
+
+.transfer-card p {
+    margin: 6px 0;
+    color: #5f6978;
+}
+
+.empty {
+    text-align: center;
+    color: #697386;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <p>Admin Control Panel</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="dashboard.html">← Back to Dashboard</a>
+
+    <div class="card">
+
+        <h2>Add Transfer</h2>
+
+        <form id="transferForm">
+
+            <label>Player</label>
+            <select id="player" required>
+                <option value="">Select Player</option>
+            </select>
+
+            <label>From Team</label>
+            <select id="fromTeam">
+                <option value="">Free Agent / None</option>
+            </select>
+
+            <label>To Team</label>
+            <select id="toTeam">
+                <option value="">Free Agent / None</option>
+            </select>
+
+            <label>Transfer Date</label>
+            <input type="date" id="transferDate">
+
+            <label>Transfer Type</label>
+            <select id="transferType">
+                <option value="">Select Type</option>
+                <option value="Permanent">Permanent</option>
+                <option value="Loan">Loan</option>
+                <option value="Trial">Trial</option>
+                <option value="Return">Return</option>
+                <option value="Free Agent">Free Agent</option>
+            </select>
+
+            <label>Transfer Fee</label>
+            <input
+                type="text"
+                id="fee"
+                placeholder="Example: ₹5,00,000 or Free"
+            >
+
+            <label>Notes</label>
+            <textarea
+                id="notes"
+                placeholder="Additional transfer information"
+            ></textarea>
+
+            <button type="submit">Add Transfer</button>
+
+        </form>
+
+        <div id="message" class="message"></div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Transfer History</h2>
+
+        <div id="transferList">
+            <div class="empty">Loading transfers...</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const { createClient } = supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+const form = document.getElementById("transferForm");
+const playerSelect = document.getElementById("player");
+const fromTeamSelect = document.getElementById("fromTeam");
+const toTeamSelect = document.getElementById("toTeam");
+const transferList = document.getElementById("transferList");
+const message = document.getElementById("message");
+
+async function checkAdmin() {
+
+    const {
+        data: { user }
+    } = await db.auth.getUser();
+
+    if (!user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    const { data, error } = await db.rpc("is_admin");
+
+    if (error || !data) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    return true;
+}
+
+async function loadPlayers() {
+
+    const { data, error } = await db
+        .from("players")
+        .select("id, name, ign")
+        .order("name");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    playerSelect.innerHTML =
+        '<option value="">Select Player</option>';
+
+    (data || []).forEach(player => {
+
+        const option = document.createElement("option");
+
+        option.value = player.id;
+
+        option.textContent =
+            player.ign
+                ? `${player.name} (${player.ign})`
+                : player.name;
+
+        playerSelect.appendChild(option);
+
+    });
+}
+
+async function loadTeams() {
+
+    const { data, error } = await db
+        .from("teams")
+        .select("id, name")
+        .order("name");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    fromTeamSelect.innerHTML =
+        '<option value="">Free Agent / None</option>';
+
+    toTeamSelect.innerHTML =
+        '<option value="">Free Agent / None</option>';
+
+    (data || []).forEach(team => {
+
+        const option1 = document.createElement("option");
+        option1.value = team.id;
+        option1.textContent = team.name;
+
+        const option2 = option1.cloneNode(true);
+
+        fromTeamSelect.appendChild(option1);
+        toTeamSelect.appendChild(option2);
+
+    });
+}
+
+async function loadTransfers() {
+
+    const { data, error } = await db
+        .from("transfers")
+        .select(`
+            id,
+            transfer_date,
+            transfer_type,
+            fee,
+            notes,
+            players (
+                name,
+                ign
+            ),
+            from_team:teams!transfers_from_team_id_fkey (
+                name
+            ),
+            to_team:teams!transfers_to_team_id_fkey (
+                name
+            )
+        `)
+        .order("transfer_date", { ascending: false });
+
+    if (error) {
+
+        transferList.innerHTML = `
+            <div class="error">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        transferList.innerHTML = `
+            <div class="empty">
+                No transfers added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    transferList.innerHTML = data.map(transfer => {
+
+        const playerName =
+            transfer.players?.name || "Unknown Player";
+
+        const ign =
+            transfer.players?.ign
+                ? ` (${transfer.players.ign})`
+                : "";
+
+        const fromTeam =
+            transfer.from_team?.name || "Free Agent";
+
+        const toTeam =
+            transfer.to_team?.name || "Free Agent";
+
+        return `
+            <div class="transfer-card">
+
+                <h3>
+                    ${escapeHtml(playerName)}
+                    ${escapeHtml(ign)}
+                </h3>
+
+                <p>
+                    <strong>From:</strong>
+                    ${escapeHtml(fromTeam)}
+                </p>
+
+                <p>
+                    <strong>To:</strong>
+                    ${escapeHtml(toTeam)}
+                </p>
+
+                ${
+                    transfer.transfer_date
+                    ? `
+                        <p>
+                            <strong>Date:</strong>
+                            ${formatDate(transfer.transfer_date)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    transfer.transfer_type
+                    ? `
+                        <p>
+                            <strong>Type:</strong>
+                            ${escapeHtml(transfer.transfer_type)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    transfer.fee
+                    ? `
+                        <p>
+                            <strong>Fee:</strong>
+                            ${escapeHtml(transfer.fee)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                ${
+                    transfer.notes
+                    ? `
+                        <p>
+                            <strong>Notes:</strong>
+                            ${escapeHtml(transfer.notes)}
+                        </p>
+                    `
+                    : ""
+                }
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTransfer(${transfer.id})"
+                >
+                    Delete
+                </button>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const playerId = playerSelect.value;
+
+    if (!playerId) {
+        showMessage("Please select a player.", true);
+        return;
+    }
+
+    const fromTeam = fromTeamSelect.value;
+    const toTeam = toTeamSelect.value;
+
+    if (
+        fromTeam &&
+        toTeam &&
+        fromTeam === toTeam
+    ) {
+        showMessage(
+            "From Team and To Team cannot be the same.",
+            true
+        );
+        return;
+    }
+
+    const { error } = await db
+        .from("transfers")
+        .insert({
+            player_id: Number(playerId),
+
+            from_team_id:
+                fromTeam
+                    ? Number(fromTeam)
+                    : null,
+
+            to_team_id:
+                toTeam
+                    ? Number(toTeam)
+                    : null,
+
+            transfer_date:
+                document
+                    .getElementById("transferDate")
+                    .value || null,
+
+            transfer_type:
+                document
+                    .getElementById("transferType")
+                    .value || null,
+
+            fee:
+                document
+                    .getElementById("fee")
+                    .value
+                    .trim() || null,
+
+            notes:
+                document
+                    .getElementById("notes")
+                    .value
+                    .trim() || null
+        });
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("Transfer added successfully.");
+
+    form.reset();
+
+    await loadTransfers();
+
+});
+
+async function deleteTransfer(id) {
+
+    if (!confirm("Delete this transfer?")) {
+        return;
+    }
+
+    const { error } = await db
+        .from("transfers")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        showMessage(error.message, true);
+        return;
+
+    }
+
+    showMessage("Transfer deleted.");
+
+    await loadTransfers();
+}
+
+function showMessage(text, isError = false) {
+
+    message.textContent = text;
+
+    message.className =
+        "message " +
+        (isError ? "error" : "success");
+
+    message.style.display = "block";
+
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 4000);
+}
+
+function formatDate(date) {
+
+    if (!date) {
+        return "";
+    }
+
+    const d = new Date(date + "T00:00:00");
+
+    return d.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+async function start() {
+
+    const isAdmin = await checkAdmin();
+
+    if (!isAdmin) {
+        return;
+    }
+
+    await loadPlayers();
+    await loadTeams();
+    await loadTransfers();
+}
+
+start();
+
+</script>
+
+</body>
+</html>

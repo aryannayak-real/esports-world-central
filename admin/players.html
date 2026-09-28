@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players Management</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0f19;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #151b29;
+            border: 1px solid #273043;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 7px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            background: #0f1420;
+            color: white;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        label {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background: #2563eb;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .back {
+            background: #374151;
+            margin-bottom: 20px;
+        }
+
+        .delete {
+            background: #dc2626;
+        }
+
+        .player {
+            border: 1px solid #273043;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            background: #101622;
+        }
+
+        .player-name {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .player-info {
+            color: #9ca3af;
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            color: #9ca3af;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #status {
+            margin-bottom: 15px;
+            color: #60a5fa;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <button class="back" onclick="window.location.href='dashboard.html'">
+        ← Back to Dashboard
+    </button>
+
+    <h1>Players Management</h1>
+    <div class="subtitle">
+        Add and manage esports players
+    </div>
+
+    <div id="status"></div>
+
+    <div class="card">
+
+        <h2>Add Player</h2>
+
+        <form id="playerForm">
+
+            <label>Player Name</label>
+            <input
+                type="text"
+                id="name"
+                placeholder="Example: Jonathan"
+                required
+            >
+
+            <label>In-Game Name (IGN)</label>
+            <input
+                type="text"
+                id="ign"
+                placeholder="Example: Jonathan Gaming"
+            >
+
+            <label>Country</label>
+            <input
+                type="text"
+                id="country"
+                placeholder="Example: India"
+            >
+
+            <label>Team</label>
+            <select id="team_id">
+                <option value="">No Team</option>
+            </select>
+
+            <label>Role</label>
+            <input
+                type="text"
+                id="role"
+                placeholder="Example: Assaulter"
+            >
+
+            <label>Photo URL</label>
+            <input
+                type="url"
+                id="photo_url"
+                placeholder="https://example.com/player.jpg"
+            >
+
+            <label>Bio</label>
+            <textarea
+                id="bio"
+                placeholder="Write a short player biography..."
+            ></textarea>
+
+            <button type="submit">
+                Add Player
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Existing Players</h2>
+
+        <div id="playersList">
+            <div class="empty">
+                Loading players...
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function checkAdmin() {
+
+    const { data: userData, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !userData.user) {
+        window.location.href = "index.html";
+        return false;
+    }
+
+    const { data: adminData, error: adminError } =
+        await supabaseClient.rpc("is_admin");
+
+    if (adminError || adminData !== true) {
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+        return false;
+    }
+
+    document.getElementById("status").textContent =
+        "Authenticated as admin: " + userData.user.email;
+
+    return true;
+}
+
+
+async function loadTeams() {
+
+    const { data, error } = await supabaseClient
+        .from("teams")
+        .select("id, name")
+        .order("name");
+
+    if (error) {
+        alert("Error loading teams: " + error.message);
+        return;
+    }
+
+    const select = document.getElementById("team_id");
+
+    select.innerHTML = '<option value="">No Team</option>';
+
+    data.forEach(team => {
+
+        const option = document.createElement("option");
+
+        option.value = team.id;
+        option.textContent = team.name;
+
+        select.appendChild(option);
+    });
+}
+
+
+async function loadPlayers() {
+
+    const { data, error } = await supabaseClient
+        .from("players")
+        .select(`
+            id,
+            name,
+            ign,
+            country,
+            role,
+            photo_url,
+            bio,
+            teams (
+                name
+            )
+        `)
+        .order("name");
+
+    if (error) {
+
+        document.getElementById("playersList").innerHTML =
+            '<div class="empty">Error: ' +
+            error.message +
+            '</div>';
+
+        return;
+    }
+
+    const list = document.getElementById("playersList");
+
+    if (!data || data.length === 0) {
+
+        list.innerHTML =
+            '<div class="empty">No players added yet.</div>';
+
+        return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(player => {
+
+        const div = document.createElement("div");
+
+        div.className = "player";
+
+        const teamName =
+            player.teams ? player.teams.name : "No Team";
+
+        div.innerHTML = `
+            <div class="player-name">
+                ${escapeHtml(player.name)}
+            </div>
+
+            <div class="player-info">
+                <strong>IGN:</strong>
+                ${escapeHtml(player.ign || "-")}
+                <br>
+
+                <strong>Country:</strong>
+                ${escapeHtml(player.country || "-")}
+                <br>
+
+                <strong>Team:</strong>
+                ${escapeHtml(teamName)}
+                <br>
+
+                <strong>Role:</strong>
+                ${escapeHtml(player.role || "-")}
+            </div>
+
+            <br>
+
+            <button
+                class="delete"
+                onclick="deletePlayer(${player.id})"
+            >
+                Delete
+            </button>
+        `;
+
+        list.appendChild(div);
+    });
+}
+
+
+async function deletePlayer(id) {
+
+    if (!confirm("Delete this player?")) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("players")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        alert("Delete failed: " + error.message);
+        return;
+    }
+
+    loadPlayers();
+}
+
+
+document
+    .getElementById("playerForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const player = {
+
+            name: document.getElementById("name").value.trim(),
+
+            ign: document.getElementById("ign").value.trim(),
+
+            country: document.getElementById("country").value.trim(),
+
+            team_id:
+                document.getElementById("team_id").value
+                ? Number(document.getElementById("team_id").value)
+                : null,
+
+            role: document.getElementById("role").value.trim(),
+
+            photo_url:
+                document.getElementById("photo_url").value.trim(),
+
+            bio:
+                document.getElementById("bio").value.trim()
+        };
+
+        const { error } = await supabaseClient
+            .from("players")
+            .insert([player]);
+
+        if (error) {
+
+            alert("Error adding player: " + error.message);
+            return;
+        }
+
+        alert("Player added successfully!");
+
+        document.getElementById("playerForm").reset();
+
+        loadPlayers();
+    });
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+async function init() {
+
+    const allowed = await checkAdmin();
+
+    if (!allowed) {
+        return;
+    }
+
+    await loadTeams();
+    await loadPlayers();
+}
+
+init();
+</script>
+
+</body>
+</html>

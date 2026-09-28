@@ -1,181 +1,392 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BGMI Statistics | eSports World Central</title>
+    <title>BGMI Statistics | eSports World Central</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #172033;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0f;
+            color: #fff;
+        }
 
-header {
-    background: #111827;
-    color: white;
-    padding: 20px;
-}
+        header {
+            padding: 25px 20px;
+            text-align: center;
+            background: #111118;
+            border-bottom: 1px solid #24242d;
+        }
 
-header h1 {
-    margin: 0;
-    font-size: 22px;
-}
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
 
-header p {
-    margin: 5px 0 0;
-    color: #aeb8c7;
-    font-size: 13px;
-}
+        header p {
+            margin: 8px 0 0;
+            color: #999;
+        }
 
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 25px 18px;
-}
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 20px;
+        }
 
-.back {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: #2563eb;
-    text-decoration: none;
-}
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
 
-.hero {
-    background: #182338;
-    color: white;
-    border-radius: 16px;
-    padding: 30px 22px;
-    margin-bottom: 25px;
-}
+        .top-bar h2 {
+            margin: 0;
+        }
 
-.hero h2 {
-    margin: 0 0 10px;
-    font-size: 32px;
-}
+        .search {
+            width: 280px;
+            max-width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #16161d;
+            color: white;
+            outline: none;
+        }
 
-.hero p {
-    color: #cbd5e1;
-    line-height: 1.6;
-}
+        .search:focus {
+            border-color: #777;
+        }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
+        #statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+        }
 
-.stat-card {
-    background: white;
-    border: 1px solid #e3e7ee;
-    border-radius: 14px;
-    padding: 25px 20px;
-    text-align: center;
-}
+        .stat-card {
+            background: #15151c;
+            border: 1px solid #292933;
+            border-radius: 12px;
+            padding: 20px;
+        }
 
-.stat-card h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
-    color: #697386;
-}
+        .player-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.stat-card strong {
-    font-size: 30px;
-    color: #172033;
-}
+        .ign {
+            color: #aaa;
+            margin-bottom: 15px;
+        }
 
-.coming-soon {
-    margin-top: 20px;
-    background: white;
-    border: 1px solid #e3e7ee;
-    border-radius: 14px;
-    padding: 30px 20px;
-    text-align: center;
-}
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
 
-.coming-soon p {
-    color: #697386;
-}
+        .stat-box {
+            background: #101017;
+            border-radius: 8px;
+            padding: 12px;
+        }
 
-footer {
-    text-align: center;
-    padding: 30px 15px;
-    color: #7b8494;
-    font-size: 13px;
-}
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
 
-@media (max-width: 700px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-    .hero h2 {
-        font-size: 27px;
-    }
-}
-</style>
+        .notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #292933;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .loading,
+        .empty,
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .error {
+            color: #ff7777;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            #statistics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-    <h1>eSports World Central</h1>
-    <p>The Central Hub for Competitive Gaming</p>
+    <h1>BGMI Statistics</h1>
+    <p>Player performance and competitive statistics</p>
 </header>
 
 <div class="container">
 
-    <a class="back" href="../bgmi/index.html">← Back to BGMI</a>
+    <div class="top-bar">
+        <h2>Player Statistics</h2>
 
-    <section class="hero">
-        <h2>BGMI Statistics</h2>
-        <p>
-            Explore player, team and tournament statistics
-            from the competitive BGMI esports scene.
-        </p>
-    </section>
-
-    <div class="stats-grid">
-
-        <div class="stat-card">
-            <h3>Players</h3>
-            <strong>0</strong>
-        </div>
-
-        <div class="stat-card">
-            <h3>Teams</h3>
-            <strong>0</strong>
-        </div>
-
-        <div class="stat-card">
-            <h3>Tournaments</h3>
-            <strong>0</strong>
-        </div>
-
+        <input
+            type="text"
+            id="search"
+            class="search"
+            placeholder="Search players..."
+        >
     </div>
 
-    <div class="coming-soon">
-        <h3>Statistics Coming Soon</h3>
-        <p>
-            Detailed kills, matches, finishes, MVPs,
-            team performance and tournament statistics
-            will be added as the database grows.
-        </p>
+    <div id="statistics">
+        <div class="loading">Loading statistics...</div>
     </div>
 
 </div>
 
-<footer>
-    <p>eSports World Central is an independent esports information website.</p>
-    <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
-</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const SUPABASE_URL = "https://hoclvnypllnouypzymfx.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_S7xT2BZ17bmFywJuUx-MTQ_N9cBTBso";
+
+    const supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+    let allStatistics = [];
+
+    async function loadStatistics() {
+
+        const container = document.getElementById("statistics");
+
+        const { data, error } = await supabaseClient
+            .from("player_statistics")
+            .select(`
+                id,
+                tournaments_played,
+                matches_played,
+                matches_won,
+                kills,
+                assists,
+                average_damage,
+                average_survival,
+                notes,
+                players (
+                    name,
+                    ign,
+                    country,
+                    role,
+                    photo_url
+                )
+            `)
+            .order("kills", { ascending: false });
+
+        if (error) {
+            console.error(error);
+
+            container.innerHTML = `
+                <div class="error">
+                    Unable to load statistics.
+                </div>
+            `;
+
+            return;
+        }
+
+        allStatistics = data || [];
+
+        displayStatistics(allStatistics);
+    }
+
+    function displayStatistics(statistics) {
+
+        const container = document.getElementById("statistics");
+
+        if (!statistics.length) {
+            container.innerHTML = `
+                <div class="empty">
+                    No player statistics available yet.
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = statistics.map(stat => {
+
+            const player = stat.players || {};
+
+            const name = player.name || "Unknown Player";
+            const ign = player.ign || "";
+            const role = player.role || "Player";
+
+            return `
+                <div class="stat-card">
+
+                    <div class="player-name">
+                        ${escapeHtml(name)}
+                    </div>
+
+                    <div class="ign">
+                        ${ign ? escapeHtml(ign) + " • " : ""}
+                        ${escapeHtml(role)}
+                    </div>
+
+                    <div class="stat-grid">
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Tournaments
+                            </div>
+                            <div class="stat-value">
+                                ${stat.tournaments_played ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Matches
+                            </div>
+                            <div class="stat-value">
+                                ${stat.matches_played ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Matches Won
+                            </div>
+                            <div class="stat-value">
+                                ${stat.matches_won ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Kills
+                            </div>
+                            <div class="stat-value">
+                                ${stat.kills ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Assists
+                            </div>
+                            <div class="stat-value">
+                                ${stat.assists ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Average Damage
+                            </div>
+                            <div class="stat-value">
+                                ${stat.average_damage ?? 0}
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-label">
+                                Average Survival
+                            </div>
+                            <div class="stat-value">
+                                ${escapeHtml(
+                                    stat.average_survival || "N/A"
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    ${
+                        stat.notes
+                        ? `
+                            <div class="notes">
+                                ${escapeHtml(stat.notes)}
+                            </div>
+                        `
+                        : ""
+                    }
+
+                </div>
+            `;
+
+        }).join("");
+    }
+
+    document.getElementById("search").addEventListener(
+        "input",
+        function () {
+
+            const searchText = this.value
+                .toLowerCase()
+                .trim();
+
+            const filtered = allStatistics.filter(stat => {
+
+                const player = stat.players || {};
+
+                const text = `
+                    ${player.name || ""}
+                    ${player.ign || ""}
+                    ${player.country || ""}
+                    ${player.role || ""}
+                `.toLowerCase();
+
+                return text.includes(searchText);
+            });
+
+            displayStatistics(filtered);
+        }
+    );
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    loadStatistics();
+</script>
 
 </body>
 </html>

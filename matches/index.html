@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BGMI Transfers | eSports World Central</title>
+    <title>BGMI Matches | eSports World Central</title>
 
     <style>
         * {
@@ -15,7 +15,7 @@
             margin: 0;
             font-family: Arial, sans-serif;
             background: #0b0b0f;
-            color: #fff;
+            color: #ffffff;
         }
 
         header {
@@ -46,8 +46,8 @@
             justify-content: space-between;
             align-items: center;
             gap: 15px;
-            flex-wrap: wrap;
             margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
         .top-bar h2 {
@@ -69,51 +69,45 @@
             border-color: #777;
         }
 
-        #transfers {
+        #matches {
             display: grid;
             gap: 18px;
         }
 
-        .transfer-card {
+        .match-card {
             background: #15151c;
             border: 1px solid #292933;
             border-radius: 12px;
             padding: 20px;
         }
 
-        .player {
-            font-size: 22px;
-            font-weight: bold;
+        .tournament {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 12px;
         }
 
-        .ign {
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .move {
+        .teams {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin: 22px 0;
+            gap: 25px;
             text-align: center;
+            margin: 15px 0;
         }
 
         .team {
             flex: 1;
-            background: #101017;
-            padding: 15px;
-            border-radius: 8px;
+            font-size: 20px;
             font-weight: bold;
         }
 
-        .arrow {
-            color: #aaa;
-            font-size: 22px;
+        .vs {
+            color: #777;
+            font-size: 14px;
         }
 
-        .details {
+        .match-info {
             display: flex;
             justify-content: space-between;
             gap: 10px;
@@ -124,10 +118,13 @@
             font-size: 14px;
         }
 
-        .notes {
+        .result {
             margin-top: 15px;
-            color: #aaa;
-            line-height: 1.5;
+            padding: 12px;
+            border-radius: 8px;
+            background: #101017;
+            text-align: center;
+            font-weight: bold;
         }
 
         .loading,
@@ -147,20 +144,15 @@
                 font-size: 24px;
             }
 
-            .move {
-                gap: 8px;
+            .teams {
+                gap: 10px;
             }
 
             .team {
-                font-size: 14px;
-                padding: 12px 8px;
+                font-size: 17px;
             }
 
-            .arrow {
-                font-size: 18px;
-            }
-
-            .details {
+            .match-info {
                 flex-direction: column;
             }
         }
@@ -170,25 +162,25 @@
 <body>
 
 <header>
-    <h1>BGMI Transfers</h1>
-    <p>Player transfers and team movements</p>
+    <h1>BGMI Matches</h1>
+    <p>Match results and tournament battles</p>
 </header>
 
 <div class="container">
 
     <div class="top-bar">
-        <h2>Transfers</h2>
+        <h2>Matches</h2>
 
         <input
             type="text"
             id="search"
             class="search"
-            placeholder="Search transfers..."
+            placeholder="Search matches..."
         >
     </div>
 
-    <div id="transfers">
-        <div class="loading">Loading transfers...</div>
+    <div id="matches">
+        <div class="loading">Loading matches...</div>
     </div>
 
 </div>
@@ -204,148 +196,115 @@
         SUPABASE_KEY
     );
 
-    let allTransfers = [];
+    let allMatches = [];
 
-    async function loadTransfers() {
+    async function loadMatches() {
 
-        const container = document.getElementById("transfers");
+        const container = document.getElementById("matches");
 
         const { data, error } = await supabaseClient
-            .from("transfers")
+            .from("matches")
             .select(`
                 id,
-                transfer_date,
-                transfer_type,
-                fee,
-                notes,
-                players (
-                    name,
-                    ign
-                ),
-                from_team:teams!transfers_from_team_id_fkey (
+                match_date,
+                result,
+                tournaments (
                     name
                 ),
-                to_team:teams!transfers_to_team_id_fkey (
+                team_a:teams!matches_team_a_id_fkey (
+                    name
+                ),
+                team_b:teams!matches_team_b_id_fkey (
                     name
                 )
             `)
-            .order("transfer_date", { ascending: false });
+            .order("match_date", { ascending: false });
 
         if (error) {
             console.error(error);
 
             container.innerHTML = `
                 <div class="error">
-                    Unable to load transfers.
+                    Unable to load matches.
                 </div>
             `;
 
             return;
         }
 
-        allTransfers = data || [];
+        allMatches = data || [];
 
-        displayTransfers(allTransfers);
+        displayMatches(allMatches);
     }
 
-    function displayTransfers(transfers) {
+    function displayMatches(matches) {
 
-        const container = document.getElementById("transfers");
+        const container = document.getElementById("matches");
 
-        if (!transfers.length) {
+        if (!matches.length) {
             container.innerHTML = `
                 <div class="empty">
-                    No transfers available yet.
+                    No matches found.
                 </div>
             `;
 
             return;
         }
 
-        container.innerHTML = transfers.map(transfer => {
+        container.innerHTML = matches.map(match => {
 
-            const player =
-                transfer.players?.name || "Unknown Player";
+            const tournament =
+                match.tournaments?.name || "Unknown Tournament";
 
-            const ign =
-                transfer.players?.ign || "";
+            const teamA =
+                match.team_a?.name || "Team A";
 
-            const fromTeam =
-                transfer.from_team?.name || "Free Agent";
+            const teamB =
+                match.team_b?.name || "Team B";
 
-            const toTeam =
-                transfer.to_team?.name || "Free Agent";
-
-            const date = transfer.transfer_date
-                ? new Date(
-                    transfer.transfer_date + "T00:00:00"
-                ).toLocaleDateString()
+            const date = match.match_date
+                ? new Date(match.match_date).toLocaleString()
                 : "Date not available";
 
-            const type =
-                transfer.transfer_type || "Transfer";
-
-            const fee =
-                transfer.fee || "Not disclosed";
+            const result =
+                match.result || "Result not available";
 
             return `
-                <div class="transfer-card">
+                <div class="match-card">
 
-                    <div class="player">
-                        ${escapeHtml(player)}
+                    <div class="tournament">
+                        ${escapeHtml(tournament)}
                     </div>
 
-                    ${
-                        ign
-                        ? `
-                            <div class="ign">
-                                ${escapeHtml(ign)}
-                            </div>
-                        `
-                        : ""
-                    }
-
-                    <div class="move">
+                    <div class="teams">
 
                         <div class="team">
-                            ${escapeHtml(fromTeam)}
+                            ${escapeHtml(teamA)}
                         </div>
 
-                        <div class="arrow">
-                            →
+                        <div class="vs">
+                            VS
                         </div>
 
                         <div class="team">
-                            ${escapeHtml(toTeam)}
+                            ${escapeHtml(teamB)}
                         </div>
 
                     </div>
 
-                    <div class="details">
-
+                    <div class="match-info">
                         <span>
                             📅 ${escapeHtml(date)}
                         </span>
 
                         <span>
-                            ${escapeHtml(type)}
+                            Match #${match.id}
                         </span>
-
-                        <span>
-                            Fee: ${escapeHtml(fee)}
-                        </span>
-
                     </div>
 
-                    ${
-                        transfer.notes
-                        ? `
-                            <div class="notes">
-                                ${escapeHtml(transfer.notes)}
-                            </div>
-                        `
-                        : ""
-                    }
+                    <div class="result">
+                        ${escapeHtml(result)}
+                    </div>
 
                 </div>
             `;
@@ -361,35 +320,31 @@
                 .toLowerCase()
                 .trim();
 
-            const filtered = allTransfers.filter(transfer => {
+            const filtered = allMatches.filter(match => {
 
-                const player =
-                    transfer.players?.name || "";
+                const tournament =
+                    match.tournaments?.name || "";
 
-                const ign =
-                    transfer.players?.ign || "";
+                const teamA =
+                    match.team_a?.name || "";
 
-                const fromTeam =
-                    transfer.from_team?.name || "";
+                const teamB =
+                    match.team_b?.name || "";
 
-                const toTeam =
-                    transfer.to_team?.name || "";
-
-                const type =
-                    transfer.transfer_type || "";
+                const result =
+                    match.result || "";
 
                 const text = `
-                    ${player}
-                    ${ign}
-                    ${fromTeam}
-                    ${toTeam}
-                    ${type}
+                    ${tournament}
+                    ${teamA}
+                    ${teamB}
+                    ${result}
                 `.toLowerCase();
 
                 return text.includes(searchText);
             });
 
-            displayTransfers(filtered);
+            displayMatches(filtered);
         }
     );
 
@@ -403,7 +358,7 @@
             .replace(/'/g, "&#039;");
     }
 
-    loadTransfers();
+    loadMatches();
 </script>
 
 </body>
