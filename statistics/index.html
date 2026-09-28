@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BGMI Statistics | eSports World Central</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #aeb8c7;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.hero {
+    background: #182338;
+    color: white;
+    border-radius: 16px;
+    padding: 30px 22px;
+    margin-bottom: 25px;
+}
+
+.hero h2 {
+    margin: 0 0 10px;
+    font-size: 32px;
+}
+
+.hero p {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    color: #697386;
+}
+
+.stat-card strong {
+    font-size: 30px;
+    color: #172033;
+}
+
+.coming-soon {
+    margin-top: 20px;
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.coming-soon p {
+    color: #697386;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #7b8494;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h2 {
+        font-size: 27px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <p>The Central Hub for Competitive Gaming</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="../bgmi/index.html">← Back to BGMI</a>
+
+    <section class="hero">
+        <h2>BGMI Statistics</h2>
+        <p>
+            Explore player, team and tournament statistics
+            from the competitive BGMI esports scene.
+        </p>
+    </section>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h3>Players</h3>
+            <strong>0</strong>
+        </div>
+
+        <div class="stat-card">
+            <h3>Teams</h3>
+            <strong>0</strong>
+        </div>
+
+        <div class="stat-card">
+            <h3>Tournaments</h3>
+            <strong>0</strong>
+        </div>
+
+    </div>
+
+    <div class="coming-soon">
+        <h3>Statistics Coming Soon</h3>
+        <p>
+            Detailed kills, matches, finishes, MVPs,
+            team performance and tournament statistics
+            will be added as the database grows.
+        </p>
+    </div>
+
+</div>
+
+<footer>
+    <p>eSports World Central is an independent esports information website.</p>
+    <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
+</footer>
+
+</body>
+</html>
