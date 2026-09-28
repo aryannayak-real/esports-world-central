@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teams | eSports World Central</title>
+<meta name="description" content="Explore esports teams and organizations on eSports World Central.">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #172033;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #aeb8c7;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.page-title {
+    margin-bottom: 25px;
+}
+
+.page-title h2 {
+    margin: 0 0 8px;
+    font-size: 32px;
+}
+
+.page-title p {
+    margin: 0;
+    color: #697386;
+    line-height: 1.6;
+}
+
+.search-box {
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+}
+
+.section-title {
+    margin-bottom: 15px;
+}
+
+.section-title h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.team-card {
+    background: white;
+    border: 1px solid #e3e7ee;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.logo {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    background: #e9edf3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.team-card h4 {
+    margin: 0 0 7px;
+    font-size: 18px;
+}
+
+.team-card p {
+    margin: 4px 0;
+    color: #697386;
+    font-size: 14px;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #eef2ff;
+    color: #374151;
+    font-size: 12px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #7b8494;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title h2 {
+        font-size: 27px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>eSports World Central</h1>
+    <p>The Central Hub for Competitive Gaming</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="../index.html">← Back to Home</a>
+
+    <section class="page-title">
+        <h2>Esports Teams</h2>
+        <p>
+            Explore esports teams and organizations across competitive gaming.
+            Team profiles will eventually include rosters, tournament results,
+            achievements, statistics, transfers and history.
+        </p>
+    </section>
+
+    <div class="search-box">
+        <input
+            type="text"
+            id="teamSearch"
+            placeholder="Search teams..."
+            onkeyup="searchTeams()"
+        >
+    </div>
+
+    <div class="section-title">
+        <h3>Teams</h3>
+    </div>
+
+    <div class="team-grid" id="teamGrid">
+
+        <div class="team-card">
+            <div class="logo">🎮</div>
+            <h4>BGMI Teams</h4>
+            <p>Game: BGMI</p>
+            <p>Region: India</p>
+            <span class="status">Database Section</span>
+        </div>
+
+        <div class="team-card">
+            <div class="logo">🌐</div>
+            <h4>More Teams Coming Soon</h4>
+            <p>Game: Multiple</p>
+            <p>Region: Global</p>
+            <span class="status">Coming Soon</span>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    <p>eSports World Central is an independent esports information project.</p>
+    <p>Not affiliated with BGMI, KRAFTON, or any esports organization.</p>
+</footer>
+
+<script>
+function searchTeams() {
+    const input = document.getElementById("teamSearch");
+    const filter = input.value.toLowerCase();
+    const cards = document.querySelectorAll(".team-card");
+
+    cards.forEach(function(card) {
+        const text = card.textContent.toLowerCase();
+
+        if (text.includes(filter)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
