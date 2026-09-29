@@ -96,6 +96,32 @@
             cursor: pointer;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #151b29;
+            border: 1px solid #293246;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            color: #9ba6ba;
+            font-size: 14px;
+        }
+
         .status {
             margin-top: 25px;
             background: #151b29;
@@ -184,6 +210,45 @@
 </div>
     </div>
 
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-number" id="teamsCount">—</div>
+            <div class="stat-label">Teams</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="playersCount">—</div>
+            <div class="stat-label">Players</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="tournamentsCount">—</div>
+            <div class="stat-label">Tournaments</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="matchesCount">—</div>
+            <div class="stat-label">Matches</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="statisticsCount">—</div>
+            <div class="stat-label">Statistics</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="transfersCount">—</div>
+            <div class="stat-label">Transfers</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number" id="historyCount">—</div>
+            <div class="stat-label">History</div>
+        </div>
+
+    </div>
+
     <div class="status">
         <h3>System Status</h3>
         <div id="statusText">Checking authentication...</div>
@@ -248,6 +313,35 @@ async function checkAdmin() {
     }
 }
 
+async function loadDashboardCounts() {
+
+    const tables = [
+        ["teams", "teamsCount"],
+        ["players", "playersCount"],
+        ["tournaments", "tournamentsCount"],
+        ["matches", "matchesCount"],
+        ["player_statistics", "statisticsCount"],
+        ["transfers", "transfersCount"],
+        ["history", "historyCount"]
+    ];
+
+    for (const [table, elementId] of tables) {
+
+        const { count, error } = await supabaseClient
+            .from(table)
+            .select("*", { count: "exact", head: true });
+
+        const element = document.getElementById(elementId);
+
+        if (error) {
+            element.textContent = "?";
+            console.error("Count error for " + table + ":", error.message);
+        } else {
+            element.textContent = count ?? 0;
+        }
+    }
+}
+
 document.getElementById("logoutButton").addEventListener(
     "click",
     async function() {
@@ -257,6 +351,7 @@ document.getElementById("logoutButton").addEventListener(
 );
 
 checkAdmin();
+loadDashboardCounts();
 </script>
 
 </body>
