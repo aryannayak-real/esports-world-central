@@ -181,11 +181,11 @@
                 placeholder="Example: India"
             >
 
-            <label>Logo URL</label>
-            <input
-                type="url"
-                id="logoUrl"
-                placeholder="https://example.com/logo.png"
+            <label>Team Logo</label>
+           <input
+              type="file"
+              id="logoFile"
+              accept="image/*"
             >
 
             <label>Description</label>
@@ -345,11 +345,42 @@ document.getElementById("teamForm").addEventListener(
         button.textContent = "Adding...";
         message.textContent = "";
 
+        const logoFile = document.getElementById("logoFile").files[0];
+
+        let logoUrl = "";
+
+        if (logoFile) {
+            const fileName =
+                Date.now() + "-" +
+                logoFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+
+            const { error: uploadError } = await supabaseClient
+                .storage
+                .from("esports-images")
+                .upload("teams/" + fileName, logoFile);
+
+            if (uploadError) {
+                message.textContent =
+                    "Image upload error: " + uploadError.message;
+                button.disabled = false;
+                button.textContent = "Add Team";
+                return;
+            }
+
+            const { data: publicData } =
+                supabaseClient
+                    .storage
+                    .from("esports-images")
+                    .getPublicUrl("teams/" + fileName);
+
+            logoUrl = publicData.publicUrl;
+        }
+
         const team = {
             name: document.getElementById("name").value.trim(),
             short_name: document.getElementById("shortName").value.trim(),
             country: document.getElementById("country").value.trim(),
-            logo_url: document.getElementById("logoUrl").value.trim(),
+            logo_url: logoUrl,
             description: document.getElementById("description").value.trim()
         };
 

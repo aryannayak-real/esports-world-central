@@ -177,11 +177,11 @@
                 placeholder="Example: Assaulter"
             >
 
-            <label>Photo URL</label>
+            <label>Player Photo</label>
             <input
-                type="url"
-                id="photo_url"
-                placeholder="https://example.com/player.jpg"
+                type="file"
+                id="photoFile"
+                accept="image/*"
             >
 
             <label>Bio</label>
@@ -388,6 +388,36 @@ document
 
         event.preventDefault();
 
+        const photoFile = document.getElementById("photoFile").files[0];
+
+        let photoUrl = "";
+
+        if (photoFile) {
+            const fileName =
+                Date.now() + "-" +
+                photoFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+
+            const filePath = "players/" + fileName;
+
+            const { error: uploadError } = await supabaseClient
+                .storage
+                .from("esports-images")
+                .upload(filePath, photoFile);
+
+            if (uploadError) {
+                alert("Image upload error: " + uploadError.message);
+                return;
+            }
+
+            const publicUrlResult =
+                supabaseClient
+                    .storage
+                    .from("esports-images")
+                    .getPublicUrl(filePath);
+
+            photoUrl = publicUrlResult.data.publicUrl;
+        }
+
         const player = {
 
             name: document.getElementById("name").value.trim(),
@@ -403,8 +433,7 @@ document
 
             role: document.getElementById("role").value.trim(),
 
-            photo_url:
-                document.getElementById("photo_url").value.trim(),
+            photo_url: photoUrl,
 
             bio:
                 document.getElementById("bio").value.trim()
