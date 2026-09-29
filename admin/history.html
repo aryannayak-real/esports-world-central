@@ -191,11 +191,11 @@ button:hover {
                 placeholder="Write the historical event or information..."
             ></textarea>
 
-            <label>Image URL</label>
+            <label>History Image</label>
             <input
-                type="url"
-                id="imageUrl"
-                placeholder="https://example.com/image.jpg"
+                type="file"
+                id="imageFile"
+                accept="image/*"
             >
 
             <button type="submit">Add History</button>
@@ -353,6 +353,37 @@ form.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
+    const imageFile = document.getElementById("imageFile").files[0];
+
+    let imageUrl = null;
+
+    if (imageFile) {
+
+        const fileName =
+            Date.now() + "-" +
+            imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+
+        const filePath = "history/" + fileName;
+
+        const { error: uploadError } = await db
+            .storage
+            .from("esports-images")
+            .upload(filePath, imageFile);
+
+        if (uploadError) {
+            showMessage("Image upload error: " + uploadError.message, true);
+            return;
+        }
+
+        const publicUrlResult =
+            db
+                .storage
+                .from("esports-images")
+                .getPublicUrl(filePath);
+
+        imageUrl = publicUrlResult.data.publicUrl;
+    }
+
     const { error } = await db
         .from("history")
         .insert({
@@ -378,11 +409,7 @@ form.addEventListener("submit", async function(event) {
                     .value
                     .trim() || null,
 
-            image_url:
-                document
-                    .getElementById("imageUrl")
-                    .value
-                    .trim() || null
+            image_url: imageUrl
         });
 
     if (error) {
